@@ -18,6 +18,7 @@
      src="{{ $imagePath | safeURL }}" 
      alt="{{ with .Params.alt }}{{ . }}{{ else }}{{ .Title }}{{ end }}" 
      class="img-fluid mb-5 w-100 rounded-4">
+
           {{ else }}
           <!-- /image cdn -->
 
@@ -34,9 +35,12 @@
             <source srcset="{{ $imageMD.RelPermalink }}" media="(max-width: 767px)">
             <source srcset="{{ $imageLG.RelPermalink }}" media="(max-width: 992px)">
             <source srcset="{{ $imageXL.RelPermalink }}">
-            <img loading="lazy" decoding="async" class="img-fluid mb-5 w-100 rounded-4"
-              src="{{$imageFallback.RelPermalink}}" alt="{{.Title}}" width="{{$image.Width}}"
-              height="{{$image.Height}}">
+            <img loading="lazy" decoding="async" 
+     class="img-fluid mb-5 w-100 rounded-4" 
+     src="{{ $imageFallback.RelPermalink }}" 
+     alt="{{ with .Params.alt }}{{ . }}{{ else }}{{ .Title }}{{ end }}" 
+     width="{{ $image.Width }}" 
+     height="{{ $image.Height }}">
           </picture>
           {{ else }}
           <strong class="text-danger">`{{$imagePath}}` doesn't exist</strong>
@@ -92,7 +96,7 @@
     <!-- releted post -->
     <div class="row">
         {{ $currentCategories := .Params.categories }}
-        {{ $related := where (where site.RegularPages "Params.categories" "intersect" $currentCategories) "Title" "!=" .Title }}
+        {{ $related := where (where site.RegularPages "Params.categories" "intersect" $currentCategories) "Title" "!=" .Title }}  
       {{ range first 3 $related }}
       <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
       {{ .Render "post" }}
