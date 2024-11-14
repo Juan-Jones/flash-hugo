@@ -12,50 +12,54 @@
         {{ $imagePath:= .Params.image }}
         {{ if $imagePath }}
         <div class="position-relative">
-        {{ partial "image.html" (dict "Src" $imagePath "Alt" .Params.alt "Class" "img-fluid mb-5 w-100 rounded-4") }}  
+          {{ partial "image.html" (dict "Src" $imagePath "Alt" .Params.alt "Class" "img-fluid mb-5 w-100 rounded-4") }}  
+          
           <!-- image CDN -->
           {{ if hasPrefix $imagePath "http" }}
-          <img loading="lazy" decoding="async" src="{{ $imagePath | safeURL }}" alt="{{ .Title }}"
-            class="img-fluid mb-5 w-100 rounded-4">
+            <img loading="lazy" decoding="async" src="{{ $imagePath | safeURL }}" alt="{{ .Title }}"
+                 class="img-fluid mb-5 w-100 rounded-4">
           {{ else }}
-          <!-- /image cdn -->
 
-          {{- $Src := .Src -}}
-{{- $Alt := .Alt | default "Default Alt Text" -}} <!-- Fallback Alt -->
-{{- $Class := .Class -}}
+            {{- $Src := .Src -}}
+            {{- $Alt := .Alt | default "Default Alt Text" -}}
+            {{- $Class := .Class -}}
 
-{{ if fileExists (add `assets/` $Src) }}
-  {{ $image := resources.Get $Src }}
-  {{ $imageFallback := $image.Resize "1400x" }}
-  {{ $imageXL := $image.Resize "1400x webp" }}
-  {{ $imageLG := $image.Resize "1000x webp" }}
-  {{ $imageMD := $image.Resize "800x webp" }}
-  {{ $imageSM := $image.Resize "600x webp" }}
-  <picture>
-    <source srcset="{{ $imageSM.RelPermalink }}" media="(max-width: 575px)">
-    <source srcset="{{ $imageMD.RelPermalink }}" media="(max-width: 767px)">
-    <source srcset="{{ $imageLG.RelPermalink }}" media="(max-width: 992px)">
-    <source srcset="{{ $imageXL.RelPermalink }}">
-    <img loading="lazy" decoding="async" class="{{ $Class }}"
-      src="{{ $imageFallback.RelPermalink }}" alt="{{ $Alt }}" 
-      width="{{ $image.Width }}" height="{{ $image.Height }}">
-  </picture>
-{{ else }}
-  <strong class="text-danger">`{{ $Src }}` doesn't exist</strong>
-{{ end }}
+            {{ if fileExists (add `assets/` $Src) }}
+              {{ $image := resources.Get $Src }}
+              {{ $imageFallback := $image.Resize "1400x" }}
+              {{ $imageXL := $image.Resize "1400x webp" }}
+              {{ $imageLG := $image.Resize "1000x webp" }}
+              {{ $imageMD := $image.Resize "800x webp" }}
+              {{ $imageSM := $image.Resize "600x webp" }}
+              <picture>
+                <source srcset="{{ $imageSM.RelPermalink }}" media="(max-width: 575px)">
+                <source srcset="{{ $imageMD.RelPermalink }}" media="(max-width: 767px)">
+                <source srcset="{{ $imageLG.RelPermalink }}" media="(max-width: 992px)">
+                <source srcset="{{ $imageXL.RelPermalink }}">
+                <img loading="lazy" decoding="async" class="{{ $Class }}"
+                     src="{{ $imageFallback.RelPermalink }}" alt="{{ $Alt }}" 
+                     width="{{ $image.Width }}" height="{{ $image.Height }}">
+              </picture>
+            {{ else }}
+              <strong class="text-danger">`{{ $Src }}` doesn't exist</strong>
+            {{ end }}
+
+          {{ end }}
+          
           <ul class="list-inline card-badge">
             {{ range .Params.categories }}
-            <li class="list-inline-item">
-              <a href="{{`categories/` | relLangURL}}{{. | lower | urlize}}" class="badge badge-primary py-1">{{. | title}}</a>
-            </li>
+              <li class="list-inline-item">
+                <a href="{{`categories/` | relLangURL}}{{. | lower | urlize}}" class="badge badge-primary py-1">{{. | title}}</a>
+              </li>
             {{ end }}
           </ul>
         </div>
         {{ else }}
-        {{ range .Params.categories }}
-        <a href="{{`categories/` | relLangURL}}{{. | lower | urlize}}" class="badge badge-primary mb-4 d-inline-block">{{. | title}}</a>
+          {{ range .Params.categories }}
+            <a href="{{`categories/` | relLangURL}}{{. | lower | urlize}}" class="badge badge-primary mb-4 d-inline-block">{{. | title}}</a>
+          {{ end }}
         {{ end }}
-        {{ end }}
+
         <h1 class="h3 mb-4">{{.Title | markdownify}}</h1>
         <ul class="list-inline card-meta d-flex align-items-center mb-4">
           <li class="list-inline-item d-flex align-items-center">
@@ -68,6 +72,8 @@
           </li>
         </ul>
         <div class="content drop-cap">{{.Content}}</div>
+      </div> <!-- Closing col-lg-8 -->
+
       <!-- sidebar widgets -->
       <aside class="col-lg-4">
         {{ $widget:= site.Params.widgets.sidebar }}
@@ -78,46 +84,48 @@
 </section>
 <!--=================== section end ===================-->
 
-<!--=================== section start ===================-->
+<!--=================== Related Posts Section ===================-->
 <section class="section-sm pt-0">
   <div class="container">
     <div class="row">
       <div class="col-12">
         <div class="section-title">
-          <h2 class="h4 title-border">Releted Posts</h2>
+          <h2 class="h4 title-border">Related Posts</h2>
         </div>
       </div>
     </div>
 
-      <!-- related post -->
-<div class="row">
-  {{ $currentCategories := .Params.categories }}
-  {{ $related := where (where site.RegularPages "Params.categories" "intersect" $currentCategories) "Title" "!=" .Title }}
-  
-  {{ range first 3 $related }}
-  <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
-    {{ .Render "post" }}
+    <!-- related post -->
+    <div class="row">
+      {{ $currentCategories := .Params.categories }}
+      {{ $related := where (where site.RegularPages "Params.categories" "intersect" $currentCategories) "Title" "!=" .Title }}
+      {{ range first 3 $related }}
+      <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+        {{ .Render "post" }}
+      </div>
+      {{ end }}
+    </div>
   </div>
-  {{ end }}
-</div>
 </section>
 <!--=================== section end ===================-->
 
-<!-- regular page -->
+<!-- Regular Page -->
 {{ else }}
-{{ partial "page-header.html" . }}
-<section class="section-sm">
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-10 mx-auto">
-        <div class="content">
-          {{.Content}}
+  {{ partial "page-header.html" . }}
+  <section class="section-sm">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-10 mx-auto">
+          <div class="content">
+            {{.Content}}
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 {{ end }}
-<!-- /regular page -->
+
+<!-- Breadcrumbs -->
 {{ partial "breadcrumbs.html" . }}
+
 {{ end }}
