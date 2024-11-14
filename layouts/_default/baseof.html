@@ -26,9 +26,11 @@ AUTHOR WEBSITE: https://gethugothemes.com
 	{{ if hugo.IsProduction }}
 	{{ partialCached "preloader.html" . }}
 	{{ partial "header.html" . }}
+  {{ partial "breadcrumbs.html" . }}
 	{{ else }}
 	{{ partial "preloader.html" . }}
 	{{ partial "header.html" . }}
+  {{ partial "breadcrumbs.html" . }}
 	{{ end }}
 
 	<main>
