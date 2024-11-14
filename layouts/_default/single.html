@@ -15,9 +15,9 @@
           <!-- image CDN -->
           {{ if hasPrefix $imagePath "http" }}
           <img loading="lazy" decoding="async" 
-     src="{{ $imagePath | safeURL }}" 
-     alt="{{ with .Params.alt }}{{ . }}{{ else }}{{ .Title }}{{ end }}" 
-     class="img-fluid mb-5 w-100 rounded-4">
+          src="{{ $imagePath | safeURL }}" 
+          alt="{{ with .Params.alt }}{{ . }}{{ else }}{{ .Title }}{{ end }}" 
+          class="img-fluid mb-5 w-100 rounded-4">
 
           {{ else }}
           <!-- /image cdn -->
@@ -36,11 +36,11 @@
             <source srcset="{{ $imageLG.RelPermalink }}" media="(max-width: 992px)">
             <source srcset="{{ $imageXL.RelPermalink }}">
             <img loading="lazy" decoding="async" 
-     class="img-fluid mb-5 w-100 rounded-4" 
-     src="{{ $imageFallback.RelPermalink }}" 
-     alt="{{ with .Params.alt }}{{ . }}{{ else }}{{ .Title }}{{ end }}" 
-     width="{{ $image.Width }}" 
-     height="{{ $image.Height }}">
+            class="img-fluid mb-5 w-100 rounded-4" 
+            src="{{ $imageFallback.RelPermalink }}" 
+            alt="{{ with .Params.alt }}{{ . }}{{ else }}{{ .Title }}{{ end }}" 
+            width="{{ $image.Width }}" 
+            height="{{ $image.Height }}">
           </picture>
           {{ else }}
           <strong class="text-danger">`{{$imagePath}}` doesn't exist</strong>
@@ -125,4 +125,3 @@
 <!-- /regular page -->
 
 {{ end }}
-{{ partial "breadcrumbs.html" . }}
