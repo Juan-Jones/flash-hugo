@@ -14,10 +14,13 @@
         <div class="position-relative">
           <!-- image CDN -->
           {{ if hasPrefix $imagePath "http" }}
-          <img loading="lazy" decoding="async" src="{{ $imagePath | safeURL }}" alt="{{ .Params.alt | default .Title }}"
-            class="img-fluid mb-5 w-100 rounded-4">
+          <img loading="lazy" decoding="async" 
+     src="{{ $imagePath | safeURL }}" 
+     alt="{{ with .Params.alt }}{{ . }}{{ else }}{{ .Title }}{{ end }}" 
+     class="img-fluid mb-5 w-100 rounded-4">
           {{ else }}
           <!-- /image cdn -->
+
           <!-- image processing for multiple device -->
           {{ if fileExists (add `assets/` $imagePath) }}
           {{ $image:= resources.Get $imagePath }}
@@ -32,7 +35,7 @@
             <source srcset="{{ $imageLG.RelPermalink }}" media="(max-width: 992px)">
             <source srcset="{{ $imageXL.RelPermalink }}">
             <img loading="lazy" decoding="async" class="img-fluid mb-5 w-100 rounded-4"
-              src="{{$imageFallback.RelPermalink}}" alt="{{ .Params.alt | default .Title}}" width="{{$image.Width}}"
+              src="{{$imageFallback.RelPermalink}}" alt="{{.Title}}" width="{{$image.Width}}"
               height="{{$image.Height}}">
           </picture>
           {{ else }}
@@ -86,16 +89,17 @@
       </div>
     </div>
 
-  <!-- related post -->
-  <div class="row">
-  {{ $currentCategories := .Params.categories }}
-  {{ $related := where (where site.RegularPages "Params.categories" "intersect" $currentCategories) "Title" "!=" .Title }}
-  {{ range first 3 $related }}
-  <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
-    {{ .Render "post" }}
+    <!-- releted post -->
+    <div class="row">
+        {{ $currentCategories := .Params.categories }}
+        {{ $related := where (where site.RegularPages "Params.categories" "intersect" $currentCategories) "Title" "!=" .Title }}
+      {{ range first 3 $related }}
+      <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+      {{ .Render "post" }}
+      </div>
+      {{ end }}
+    </div>
   </div>
-  {{ end }}
-</div>
 </section>
 <!--=================== section end ===================-->
 
@@ -117,6 +121,4 @@
 <!-- /regular page -->
 
 {{ end }}
-
-<!-- Breadcrumbs -->
 {{ partial "breadcrumbs.html" . }}
