@@ -9,42 +9,68 @@
     <div class="row">
       <div class="col-lg-8 mb-5 mb-lg-0">
         <!-- image path -->
-        {{ $imagePath:= .Params.image }}
-        {{ if $imagePath }}
-        <div class="position-relative">
-          {{ partial "image.html" (dict "Src" $imagePath "Alt" .Params.alt "Class" "img-fluid mb-5 w-100 rounded-4") }}  
-          
-          <!-- image CDN -->
-          {{ if hasPrefix $imagePath "http" }}
-            <img loading="lazy" decoding="async" src="{{ $imagePath | safeURL }}" alt="{{ .Title }}"
-                 class="img-fluid mb-5 w-100 rounded-4">
-          {{ else }}
+        {{ $imagePath := .Params.image }}
+{{ $altText := .Params.alt | default .Title }}
 
-            {{- $Src := .Src -}}
-            {{- $Alt := .Alt | default "Default Alt Text" -}}
-            {{- $Class := .Class -}}
-
-            {{ if fileExists (add `assets/` $Src) }}
-              {{ $image := resources.Get $Src }}
-              {{ $imageFallback := $image.Resize "1400x" }}
-              {{ $imageXL := $image.Resize "1400x webp" }}
-              {{ $imageLG := $image.Resize "1000x webp" }}
-              {{ $imageMD := $image.Resize "800x webp" }}
-              {{ $imageSM := $image.Resize "600x webp" }}
-              <picture>
-                <source srcset="{{ $imageSM.RelPermalink }}" media="(max-width: 575px)">
-                <source srcset="{{ $imageMD.RelPermalink }}" media="(max-width: 767px)">
-                <source srcset="{{ $imageLG.RelPermalink }}" media="(max-width: 992px)">
-                <source srcset="{{ $imageXL.RelPermalink }}">
-                <img loading="lazy" decoding="async" class="{{ $Class }}"
-                     src="{{ $imageFallback.RelPermalink }}" alt="{{ $Alt }}" 
-                     width="{{ $image.Width }}" height="{{ $image.Height }}">
-              </picture>
-            {{ else }}
-              <strong class="text-danger">`{{ $Src }}` doesn't exist</strong>
-            {{ end }}
-
-          {{ end }}
+{{ if $imagePath }}
+<div class="position-relative">
+  <!-- External image (CDN or hosted) -->
+  {{ if hasPrefix $imagePath "http" }}
+    <img src="{{ $imagePath | safeURL }}" alt="{{ $altText }}" class="img-fluid mb-5 w-100 rounded-4">
+  {{ else }}
+    <!-- Image processing for local files -->
+    {{ if or (strings.HasSuffix $imagePath "svg") (strings.HasSuffix $imagePath "gif") }}
+      <img class="img-fluid mb-5 w-100 rounded-4" src="{{ $imagePath }}" alt="{{ $altText }}">
+    {{ else }}
+      {{ if hasPrefix $imagePath "/" }}
+        {{ $image := .Resources.GetMatch (path.Split $imagePath).File }}
+        {{ if $image }}
+          {{ $imageFallback := $image.Resize "1400x" }}
+          {{ $imageXL := $image.Resize "1400x webp" }}
+          {{ $imageLG := $image.Resize "1000x webp" }}
+          {{ $imageMD := $image.Resize "800x webp" }}
+          {{ $imageSM := $image.Resize "600x webp" }}
+          <picture>
+            <source srcset="{{ $imageSM.RelPermalink }}" media="(max-width: 575px)">
+            <source srcset="{{ $imageMD.RelPermalink }}" media="(max-width: 767px)">
+            <source srcset="{{ $imageLG.RelPermalink }}" media="(max-width: 992px)">
+            <source srcset="{{ $imageXL.RelPermalink }}">
+            <img class="img-fluid mb-5 w-100 rounded-4" 
+                 src="{{ $imageFallback.RelPermalink }}" 
+                 alt="{{ $altText }}" 
+                 width="{{ $image.Width }}" height="{{ $image.Height }}">
+          </picture>
+        {{ else }}
+          <strong class="text-danger">`{{ $imagePath }}` doesn't exist</strong>
+        {{ end }}
+      {{ else }}
+        {{ if fileExists (add `assets/` $imagePath) }}
+          {{ $image := resources.Get $imagePath }}
+          {{ $imageFallback := $image.Resize "1400x" }}
+          {{ $imageXL := $image.Resize "1400x webp" }}
+          {{ $imageLG := $image.Resize "1000x webp" }}
+          {{ $imageMD := $image.Resize "800x webp" }}
+          {{ $imageSM := $image.Resize "600x webp" }}
+          <picture>
+            <source srcset="{{ $imageSM.RelPermalink }}" media="(max-width: 575px)">
+            <source srcset="{{ $imageMD.RelPermalink }}" media="(max-width: 767px)">
+            <source srcset="{{ $imageLG.RelPermalink }}" media="(max-width: 992px)">
+            <source srcset="{{ $imageXL.RelPermalink }}">
+            <img class="img-fluid mb-5 w-100 rounded-4" 
+                 src="{{ $imageFallback.RelPermalink }}" 
+                 alt="{{ $altText }}" 
+                 width="{{ $image.Width }}" height="{{ $image.Height }}">
+          </picture>
+        {{ else }}
+          <strong class="text-danger">`{{ $imagePath }}` doesn't exist</strong>
+        {{ end }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+</div>
+{{ else }}
+  <p>No image provided.</p>
+{{ end }}
           
           <ul class="list-inline card-badge">
             {{ range .Params.categories }}
@@ -72,60 +98,35 @@
           </li>
         </ul>
         <div class="content drop-cap">{{.Content}}</div>
-      </div> <!-- Closing col-lg-8 -->
-
-      <!-- sidebar widgets -->
-      <aside class="col-lg-4">
-        {{ $widget:= site.Params.widgets.sidebar }}
-        {{ partialCached "widgets/widget-wrapper" ( dict "Widgets" $widget "Scope" . )}}
-      </aside>
-    </div>
-  </div>
-</section>
-<!--=================== section end ===================-->
-
-<!--=================== Related Posts Section ===================-->
-<section class="section-sm pt-0">
-  <div class="container">
-    <div class="row">
-      <div class="col-12">
-        <div class="section-title">
-          <h2 class="h4 title-border">Related Posts</h2>
-        </div>
-      </div>
-    </div>
-
-    <!-- related post -->
-    <div class="row">
-      {{ $currentCategories := .Params.categories }}
-      {{ $related := where (where site.RegularPages "Params.categories" "intersect" $currentCategories) "Title" "!=" .Title }}
-      {{ range first 3 $related }}
-      <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
-        {{ .Render "post" }}
-      </div>
-      {{ end }}
-    </div>
-  </div>
-</section>
-<!--=================== section end ===================-->
-
-<!-- Regular Page -->
-{{ else }}
-  {{ partial "page-header.html" . }}
-  <section class="section-sm">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-10 mx-auto">
-          <div class="content">
-            {{.Content}}
-          </div>
-        </div>
+        
+        <!-- Sidebar -->
+        <aside class="col-lg-4">
+          {{ $widget := site.Params.widgets.sidebar }}
+          {{ partialCached "widgets/widget-wrapper" (dict "Widgets" $widget "Scope" .) }}
+        </aside>
       </div>
     </div>
   </section>
-{{ end }}
+  
+  <!-- Related Posts -->
+  <section class="section-sm pt-0">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <h2 class="h4 title-border">Related Posts</h2>
+        </div>
+      </div>
+      <div class="row">
+        {{ $related := where (where site.RegularPages "Params.categories" "intersect" .Params.categories) "Title" "!=" .Title }}
+        {{ range first 3 $related }}
+        <div class="col-lg-4 col-md-6 mb-4">
+          {{ .Render "post" }}
+        </div>
+        {{ end }}
+      </div>
+    </div>
+  </section>
+  {{ end }}
 
 <!-- Breadcrumbs -->
 {{ partial "breadcrumbs.html" . }}
-
-{{ end }}
