@@ -6,6 +6,9 @@
 <base href="{{ site.BaseURL }}">
 {{ end }}
 
+<!-- Canonical Link -->
+<link rel="canonical" href="{{ .Permalink }}" />
+
 <!-- multilingual SEO optimizations -->
 {{ if .IsTranslated }}
 {{ range .AllTranslations }}
