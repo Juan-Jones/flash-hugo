@@ -1,13 +1,10 @@
-<!-- /layouts/shortcodes/cloakedlink.html -->
+{{ $text := .Get 0 | default "Click here" }}
+{{ $url := .Get 1 | safeURL }}
+{{ $title := .Get 2 | default "" | htmlEscape }}
 
-
-
-{{ $text := .Get 0 }}
-
-{{ $url := .Get 1 }}
-
-{{ $title := .Get 2 }}
-
-
-
-<a href="{{ $url }}" title="{{ $title }}" rel="noopener noreferrer" target="_blank">{{ $text }}</a>
+{{ if $url }}
+  <a href="{{ $url }}" title="{{ $title }}" rel="noopener noreferrer" target="_blank">{{ $text }}</a>
+{{ else }}
+  <!-- Optionally handle missing URL -->
+  <span>{{ $text }}</span>
+{{ end }}
