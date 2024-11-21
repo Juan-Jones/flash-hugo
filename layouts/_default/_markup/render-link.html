@@ -1,7 +1,1 @@
-{{- $u := urls.Parse .Destination -}}
-<a href="{{ .Destination | safeURL }}"
-  {{- with .Title }} title="{{ . }}"{{ end -}}
-  {{- if $u.IsAbs }} rel="external nofollow"{{ end -}}
->
-  {{- with .Text }}{{ . }}{{ end -}}
-</a>
+<a href="{{ .Destination | safeURL }}"{{ with .Title}} title="{{ . }}"{{ end }} {{ if findRE "^(https?:)?//" (lower .Destination) }} class="external-link" target="_blank" rel="noopener"{{ end }}>{{ .Text | safeHTML }}</a>
