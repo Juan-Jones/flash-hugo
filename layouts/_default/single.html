@@ -14,11 +14,8 @@
         <div class="position-relative">
           <!-- image CDN -->
           {{ if hasPrefix $imagePath "http" }}
-          <img loading="lazy" decoding="async" 
-          src="{{ $imagePath | safeURL }}" 
-          alt="{{ with .Params.alt }}{{ . }}{{ else }}{{ .Title }}{{ end }}" 
-          class="img-fluid mb-5 w-100 rounded-4">
-
+          <img loading="lazy" decoding="async" src="{{ $imagePath | safeURL }}" alt="{{ .Title }}"
+            class="img-fluid mb-5 w-100 rounded-4">
           {{ else }}
           <!-- /image cdn -->
 
@@ -35,12 +32,9 @@
             <source srcset="{{ $imageMD.RelPermalink }}" media="(max-width: 767px)">
             <source srcset="{{ $imageLG.RelPermalink }}" media="(max-width: 992px)">
             <source srcset="{{ $imageXL.RelPermalink }}">
-            <img loading="lazy" decoding="async" 
-            class="img-fluid mb-5 w-100 rounded-4" 
-            src="{{ $imageFallback.RelPermalink }}" 
-            alt="{{ with .Params.alt }}{{ . }}{{ else }}{{ .Title }}{{ end }}" 
-            width="{{ $image.Width }}" 
-            height="{{ $image.Height }}">
+            <img loading="lazy" decoding="async" class="img-fluid mb-5 w-100 rounded-4"
+              src="{{$imageFallback.RelPermalink}}" alt="{{.Title}}" width="{{$image.Width}}"
+              height="{{$image.Height}}">
           </picture>
           {{ else }}
           <strong class="text-danger">`{{$imagePath}}` doesn't exist</strong>
@@ -72,6 +66,13 @@
           </li>
         </ul>
         <div class="content drop-cap">{{.Content}}</div>
+        <!-- disqus comments -->
+        {{ if .Site.DisqusShortname }}
+        <div class="border rounded p-4">
+          {{ template "_internal/disqus.html" . }}
+        </div>
+        {{ end }}
+      </div>
       <!-- sidebar widgets -->
       <aside class="col-lg-4">
         {{ $widget:= site.Params.widgets.sidebar }}
@@ -95,8 +96,8 @@
 
     <!-- releted post -->
     <div class="row">
-        {{ $currentCategories := .Params.categories }}
-        {{ $related := where (where site.RegularPages "Params.categories" "intersect" $currentCategories) "Title" "!=" .Title }}  
+      {{ $currentCategories := .Params.categories }}
+      {{ $related := where (where site.RegularPages "Params.categories" "intersect" $currentCategories) "Permalink" "!=" .Permalink }}
       {{ range first 3 $related }}
       <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
       {{ .Render "post" }}
