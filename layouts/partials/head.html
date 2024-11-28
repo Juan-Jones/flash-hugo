@@ -6,10 +6,6 @@
 <base href="{{ site.BaseURL }}">
 {{ end }}
 
-{{- with .Params.canonical -}}
-<link rel="canonical" href="{{ . | safeURL }}">
-{{- end -}}
-
 <!-- multilingual SEO optimizations -->
 {{ if .IsTranslated }}
 {{ range .AllTranslations }}
