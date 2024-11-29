@@ -1,50 +1,56 @@
+{{ if .IsHome -}}
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "name": "{{ .Site.Title }}",
+    "url": "{{ .Site.BaseURL }}",
+    "description": "{{ .Site.Params.description }}",
+    "thumbnailUrl": "{{ .Site.Params.Logo | absURL }}",
+    "license": "{{ .Site.Params.Copyright }}"
+}
+</script>
+{{ else if .IsPage }}
+{{ $author :=  or (.Params.author) (.Site.Author.name) }}
+{{ $org_name :=  .Site.Title }}
 <script type="application/ld+json">
   {
-    "@context": "https://schema.org",
-    {{ if .IsPage -}}
-    "@type": {{ if or (eq .Section "blog") (eq .Section "post") }}"BlogPosting"{{ else }}"WebPage"{{ end }},
-    "headline": "{{ .Title }}",
-    "datePublished": "{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}",
-    "dateModified": "{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}",
-    "url" : "{{ .Permalink | absURL }}",
-    "description": "{{ with (.Description | default (replaceRE "\n" " " (.Summary | truncate 170))) }}{{ . }}{{ end }}",
-    {{ with .Params.tags -}}
-    "keywords": "{{ . }}",
-    {{ end -}}
-    {{ else -}}
-    "@type": "WebPage",
-    "url" : "{{ .Permalink | absURL }}",
-    "name": "{{ .Title }}",
-    {{ with $.Param "description" -}}
-    "description": "{{ . }}",
-    {{ end -}}
-    {{ end -}}
-    {{ with $.Param "image" -}}
-    "image" : "{{ . | absURL }}",
-    {{ end -}}
-    {{ with $.Param "author" -}}
-    "author": {
-      "@type": "Person",
-      "name": "{{ . }}"
-    },
-    {{ end -}}
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": "{{ .Site.BaseURL | absURL }}"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "{{ .Site.Title  }}",
-      {{ with $.Param "icon" -}}
-      "logo" : {
-        "@type": "ImageObject",
-        "url": "{{ . | absURL }}"
+      "@context":"http://schema.org",
+      "@type":"Article",
+      "headline":"{{ .Title }}",
+      "url":"{{ .Permalink }}",
+      "keywords":[ {{ if .Keywords }}
+      {{ range $i, $e := .Keywords }}{{ if $i }}, {{ end }}"{{ $e }}"{{ end }}
+      {{ else }}
+      {{ range $i, $e := .Site.Params.keywords }}{{ if $i }}, {{ end }}"{{ $e }}"{{ end }}{{ end }}
+      ],
+      "image":{
+          "@type":"ImageObject", {{ with .Resources.Match "icon" }}{{ range . }}
+          "url": "{{ .Permalink }}", {{ end }}{{ end }}
+          "width":"1200",
+          "height":"627"
       },
-      {{ end -}}
-      "url": "{{ .Site.BaseURL | absURL }}"
-    },
-    "sameAs" : [
-      "https://www.facebook.com/earnmoneynowonline"
-    ]
+      "mainEntityOfPage":"True",
+      "publisher":{
+          "@type":"Organization",
+          "name":"{{ .Site.Params.name }}",
+          "url":"{{ .Site.BaseURL }}",
+          "logo":{
+              "@type":"ImageObject",
+              "url":"{{ .Site.Params.logourl | absURL }}",
+              "width":"357",
+              "height":"60"
+          }
+      },
+      "dateCreated":"{{ .Date.Format "2006-01-02T15:04:05-07:00" | safeHTML }}",
+      "datePublished":"{{ .PublishDate.Format "2006-01-02T15:04:05-07:00" | safeHTML }}",
+      {{ if isset .Params "author" }}
+      {{ $author := index .Site.Data.team .Params.author }}
+      "author":"{{ $author.name }}",
+      "creator":"{{ $author.name }}",
+      {{ end }}
+      "dateModified":"{{ .Lastmod.Format "2006-01-02T15:04:05-07:00" | safeHTML }}",
+      "articleSection":"Blog"
   }
-</script>
+  </script>
+{{ end }}
