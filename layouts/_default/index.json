@@ -1,14 +1,15 @@
 {{ $.Scratch.Add "index" slice }}
 {{ range site.RegularPages }}
-
+{{ $.Scratch.Set "image" nil }}  <!-- Reset image for each page -->
 {{ $date:= time.Format ":date_long" .PublishDate }}
-
 {{ with .Params.image }}
-{{ if (fileExists (add `assets/` .)) }}
-{{ $image:= resources.Get . }}
-{{ $image:= $image.Resize "650x" }}
-{{ $.Scratch.Set "image" $image.Permalink }}
-{{ end }}
+    {{ if (fileExists (add `assets/` .)) }}
+    {{ $image:= resources.Get . }}
+    {{ $image:= $image.Resize "650x" }}
+    {{ $.Scratch.Set "image" $image.Permalink }}
+    {{ end }}
+{{ else }}
+    {{ $.Scratch.Set "image" "path/to/default/image.png" }} <!-- Set default image if none provided -->
 {{ end }}
 {{ $image:= $.Scratch.Get "image" }}
 
