@@ -1,0 +1,8 @@
+{{- $jsonld := newScratch -}}
+{{- $jsonld.Set "@type" "WebSite" -}}
+{{- $jsonld.Set "@id" (printf "%s#website" site.BaseURL) -}}
+{{- $jsonld.Set "url" site.BaseURL -}}
+{{- $jsonld.Set "name" site.Title -}}
+{{- $jsonld.Set "description" site.Home.Description -}}
+{{- $jsonld.Set "inLanguage" "en-US" -}}
+{{ printf `<script type="application/ld+json">%s</script>` ($jsonld | jsonify) | safeHTML }}
