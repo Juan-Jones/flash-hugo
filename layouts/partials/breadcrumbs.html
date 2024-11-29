@@ -6,7 +6,7 @@
     <a href="{{ .Permalink }}">{{ .Title }}</a>
 {{- end -}}
 
-
+{{- if not .IsHome -}} <!-- Check if it's not the home page -->
 <nav aria-label="breadcrumb">
     <a href="{{ .Site.BaseURL }}">Home</a>
     {{- if .Parent -}}
@@ -14,4 +14,4 @@
         {{- template "recursive-breadcrumbs" . -}}
     {{- end }}
 </nav>
-
+{{- end -}}
