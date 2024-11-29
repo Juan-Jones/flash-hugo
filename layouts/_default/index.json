@@ -1,6 +1,6 @@
 {{ $.Scratch.Add "index" slice }}
 {{ range site.RegularPages }}
-{{ $.Scratch.Set "image" nil }}  <!-- Reset image for each page -->
+{{ $.Scratch.Set "image" nil }}
 {{ $date:= time.Format ":date_long" .PublishDate }}
 {{ with .Params.image }}
     {{ if (fileExists (add `assets/` .)) }}
@@ -9,7 +9,7 @@
     {{ $.Scratch.Set "image" $image.Permalink }}
     {{ end }}
 {{ else }}
-    {{ $.Scratch.Set "image" "path/to/default/image.png" }} <!-- Set default image if none provided -->
+    {{ $.Scratch.Set "image" "path/to/default/image.png" }}
 {{ end }}
 {{ $image:= $.Scratch.Get "image" }}
 
