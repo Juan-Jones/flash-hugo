@@ -1,24 +1,17 @@
 {{ $.Scratch.Add "index" slice }}
 {{ range site.RegularPages }}
-  {{ $date := time.Format ":date_long" .PublishDate }}
-  {{ $image := "" }} <!-- Default empty value for image -->
 
-  {{ with .Params.image }}
-    {{ if (fileExists (add `assets/` .)) }}
-      {{ $resizedImage := (resources.Get .).Resize "650x" }}
-      {{ $image = $resizedImage.Permalink }}
-    {{ end }}
-  {{ end }}
+{{ $date:= time.Format ":date_long" .PublishDate }}
 
-  {{ $.Scratch.Add "index" (dict 
-    "title" .Title
-    "date" $date
-    "image" $image
-    "categories" .Params.categories
-    "contents" .Plain
-    "permalink" .RelPermalink
-  ) }}
+{{ with .Params.image }}
+{{ if (fileExists (add `assets/` .)) }}
+{{ $image:= resources.Get . }}
+{{ $image:= $image.Resize "650x" }}
+{{ $.Scratch.Set "image" $image.Permalink }}
 {{ end }}
+{{ end }}
+{{ $image:= $.Scratch.Get "image" }}
 
+{{ $.Scratch.Add "index" (dict "title" .Title "date" $date "image" $image "categories" .Params.categories "contents" .Plain "permalink" .RelPermalink) }}
+{{ end }}
 {{ $.Scratch.Get "index" | jsonify }}
-
