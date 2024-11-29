@@ -1,17 +1,27 @@
 {{ $.Scratch.Add "index" slice }}
+
 {{ range site.RegularPages }}
+  {{ $date := .PublishDate.Format ":date_long" }}
+  
+  {{ with .Params.image }}
+    {{ $imagePath := (printf "assets/%s" .) }}
+    {{ if (fileExists $imagePath) }}
+      {{ $imageResource := resources.Get . }}
+      {{ $resizedImage := $imageResource.Resize "650x" }}
+      {{ $.Scratch.Set "image" $resizedImage.Permalink }}
+    {{ else }}
+      {{ $.Scratch.Set "image" nil }}
+    {{ end }}
+  {{ else }}
+    {{ $.Scratch.Set "image" nil }}
+  {{ end }}
 
-{{ $date:= time.Format ":date_long" .PublishDate }}
+  {{ $image := $.Scratch.Get "image" }}
 
-{{ with .Params.image }}
-{{ if (fileExists (add `assets/` .)) }}
-{{ $image:= resources.Get . }}
-{{ $image:= $image.Resize "650x" }}
-{{ $.Scratch.Set "image" $image.Permalink }}
-{{ end }}
-{{ end }}
-{{ $image:= $.Scratch.Get "image" }}
-
-{{ $.Scratch.Add "index" (dict "title" .Title "date" $date "image" $image "categories" .Params.categories "contents" .Plain "permalink" .RelPermalink) }}
-{{ end }}
-{{ $.Scratch.Get "index" | jsonify }}
+  {{ $.Scratch.Add "index" (dict 
+    "title" .Title 
+    "date" $date 
+    "image" $image 
+    "categories" (delimit .Params.categories ", ")
+    "contents" .Plain 
+  
