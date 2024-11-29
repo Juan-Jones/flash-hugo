@@ -14,43 +14,53 @@
 {{ $author :=  or (.Params.author) (.Site.Author.name) }}
 {{ $org_name :=  .Site.Title }}
 <script type="application/ld+json">
-  {
-      "@context":"http://schema.org",
-      "@type":"Article",
-      "headline":"{{ .Title }}",
-      "url":"{{ .Permalink }}",
-      "keywords":[ {{ if .Keywords }}
-      {{ range $i, $e := .Keywords }}{{ if $i }}, {{ end }}"{{ $e }}"{{ end }}
-      {{ else }}
-      {{ range $i, $e := .Site.Params.keywords }}{{ if $i }}, {{ end }}"{{ $e }}"{{ end }}{{ end }}
-      ],
-      "image":{
-          "@type":"ImageObject", {{ with .Resources.Match "icon" }}{{ range . }}
-          "url": "{{ .Permalink }}", {{ end }}{{ end }}
-          "width":"1200",
-          "height":"627"
-      },
-      "mainEntityOfPage":"True",
-      "publisher":{
-          "@type":"Organization",
-          "name":"{{ .Site.Params.name }}",
-          "url":"{{ .Site.BaseURL }}",
-          "logo":{
-              "@type":"ImageObject",
-              "url":"{{ .Site.Params.logourl | absURL }}",
-              "width":"357",
-              "height":"60"
-          }
-      },
-      "dateCreated":"{{ .Date.Format "2006-01-02T15:04:05-07:00" | safeHTML }}",
-      "datePublished":"{{ .PublishDate.Format "2006-01-02T15:04:05-07:00" | safeHTML }}",
-      {{ if isset .Params "author" }}
-      {{ $author := index .Site.Data.team .Params.author }}
-      "author":"{{ $author.name }}",
-      "creator":"{{ $author.name }}",
-      {{ end }}
-      "dateModified":"{{ .Lastmod.Format "2006-01-02T15:04:05-07:00" | safeHTML }}",
-      "articleSection":"Blog"
-  }
-  </script>
+{
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "articleSection": "{{ .Section }}",
+    "name": "{{ .Title | safeJS }}",
+    "headline": "{{ .Title | safeJS }}",
+    "alternativeHeadline": "{{ .Params.lead }}",
+    "description": "{{ if .Description }}{{ .Description | safeJS }}{{ else }}{{if .IsPage}}{{ .Summary  }}{{ end }}{{ end }}",
+    "inLanguage": {{ .Site.LanguageCode | default "en-us" }},
+    "isFamilyFriendly": "true",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "{{ .Permalink }}"
+    },
+    "author" : {
+        "@type": "Person",
+        "name": "{{ $author }}"
+    },
+    "creator" : {
+        "@type": "Person",
+        "name": "{{ $author }}"
+    },
+    "accountablePerson" : {
+        "@type": "Person",
+        "name": "{{ $author }}"
+    },
+    "copyrightHolder" : "{{ $org_name }}",
+    "copyrightYear" : "{{ .Date.Format "2006" }}",
+    "dateCreated": "{{ .Date.Format "2006-01-02T15:04:05.00Z" | safeHTML }}",
+    "datePublished": "{{ .PublishDate.Format "2006-01-02T15:04:05.00Z" | safeHTML }}",
+    "dateModified": "{{ .Lastmod.Format "2006-01-02T15:04:05.00Z" | safeHTML }}",
+    "publisher":{
+        "@type":"Organization",
+        "name": {{ $org_name }},
+        "url": {{ .Site.BaseURL }},
+        "logo": {
+            "@type": "ImageObject",
+            "url": "{{ .Site.Params.logo | absURL }}",
+            "width":"32",
+            "height":"32"
+        }
+    },
+    "image": {{ if .Params.images }}[{{ range $i, $e := .Params.images }}{{ if $i }}, {{ end }}{{ $e | absURL }}{{ end }}]{{ else}}{{.Site.Params.logo | absURL }}{{ end }},
+    "url" : "{{ .Permalink }}",
+    "wordCount" : "{{ .WordCount }}",
+    "genre" : [ {{ range $index, $tag := .Params.tags }}{{ if $index }}, {{ end }}"{{ $tag }}" {{ end }}],
+    "keywords" : [ {{ range $index, $keyword := .Params.keywords }}{{ if $index }}, {{ end }}"{{ $keyword }}" {{ end }}]
+}
+</script>
 {{ end }}
