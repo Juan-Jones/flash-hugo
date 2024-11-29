@@ -2,17 +2,16 @@
     {{- if .Parent -}}
         {{- template "recursive-breadcrumbs" .Parent -}}
         <span> &raquo; </span>
-        <a href="{{ .Permalink }}">{{ .Title }}</a>
     {{- end -}}
+    <a href="{{ .Permalink }}">{{ .Title }}</a>
 {{- end -}}
+
 
 <nav aria-label="breadcrumb">
     <a href="{{ .Site.BaseURL }}">Home</a>
-    
     {{- if .Parent -}}
         <span> &raquo; </span>
         {{- template "recursive-breadcrumbs" . -}}
-    {{- end -}}
-
-   
+    {{- end }}
 </nav>
+
