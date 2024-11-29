@@ -1,14 +1,13 @@
 <meta charset="utf-8">
 <title>{{.Title | default site.Title}}</title>
 
-<!-- base url -->
 {{ if or (eq site.BaseURL "/") (eq site.BaseURL "http://localhost:1313/") (eq site.BaseURL "http://examplesite.org/") (eq site.BaseURL "https://examplesite.org/") (eq site.BaseURL "http://examplesite.com/") (eq site.BaseURL "https://examplesite.com/")}}{{else}}
 <base href="{{ site.BaseURL }}">
 {{ end }}
 {{- if not .Params.Index -}}
   <meta name = "robots" content = "noindex">
 {{- end -}}
-<!-- multilingual SEO optimizations -->
+
 {{ if .IsTranslated }}
 {{ range .AllTranslations }}
 <link rel="alternate" hreflang="{{.Lang}}" href="{{ .RelPermalink | absLangURL }}">
@@ -16,14 +15,12 @@
 <link rel="alternate" hreflang="x-default" href="{{ .RelPermalink | absLangURL }}">
 {{ end }}
 
-<!-- theme meta -->
 <meta name="theme-name" content="geeky-hugo" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
 <meta name="description" content="{{ .Params.Description | default site.Params.description }}">
 {{ with site.Params.author }}<meta name="author" content="{{ . }}">{{ end }}
 {{ hugo.Generator }}
 
-<!-- favicon -->
 {{ $favicon:= site.Params.favicon }}
 {{ if $favicon }}
 {{ if fileExists (add `assets/` $favicon) }}
@@ -42,8 +39,6 @@
 <meta name="msapplication-TileColor" content="{{site.Params.variables.color_primary | default `#da532c`}}">
 <meta name="theme-color" content="{{site.Params.variables.body_color | default `#ffffff` }}">
 
-
-<!-- Open Graph and Twitter Cards -->
 {{ $imagePath := .Params.image }}
 {{ $finalImagePath := "" }}
 
@@ -60,11 +55,10 @@
     {{ $finalImagePath = printf "%s%s" site.BaseURL $imagePath }}
   {{ end }}
 {{ else }}
-  <!-- Fallback to default image -->
+
   {{ $finalImagePath = printf "%simages/default-og.png" site.BaseURL }}
 {{ end }}
 
-<!-- Open Graph metadata -->
 <meta property="og:image" content="{{ $finalImagePath }}">
 <meta property="og:image:secure_url" content="{{ $finalImagePath }}">
 <meta property="og:image:alt" content="{{ .Params.alt | default .Title }}">
@@ -73,11 +67,12 @@
 <meta property="og:description" content="{{ .Params.description | default site.Params.description }}">
 <meta property="og:url" content="{{ .Permalink }}">
 
-<!-- Twitter metadata -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ .Title | default site.Title }}">
 <meta name="twitter:description" content="{{ .Params.description | default site.Params.description }}">
 <meta name="twitter:image" content="{{ $finalImagePath }}">
 
-<!-- Include BreadcrumbList Schema -->
-{{ partial "_breadcrumbs_schema.html" . }}
+<p class="breadcrumbs">
+  {{ partial "breadcrumbs.html" . }}
+</p>
+{{ partial "_blogposting_schema.html" . }}
