@@ -89,10 +89,14 @@
 </section>
 {{ else }}
 {{ partial "page-header.html" . }}
+<p class="breadcrumbs"></p>
+  {{ partial "breadcrumbs.html" . }}
+</p>
 <section class="section-sm">
   <div class="container">
     <div class="row">
       <div class="col-lg-10 mx-auto">
+        
         {{ .Content }}
       </div>
     </div>
