@@ -1,35 +1,31 @@
-{{/* Initialize the base path and breadcrumb list */}}
 {{ $base := .Site.BaseURL }}
-{{ $url := replace .Permalink $base "" }}
-{{ $path := $base }}
-{{ $breadcrumbs := slice (dict "url" $base "name" (i18n "home")) }}
+{{ $path := "" }}
+{{ $breadcrumbs := slice (dict "url" $base "name" "Home") }}  {{/* Always start with Home */}}
 
-{{/* Split the URL and build the breadcrumb path */}}
-{{ range $index, $element := split $url "/" }}
+{{ range $index, $element := split (trim .Permalink $base) "/" }}
   {{ if ne $element "" }}
-    {{/* Update the path for each segment */}}
-    {{ $path = print $path $element "/" }}
-    {{/* Add each breadcrumb segment */}}
-    {{ $breadcrumbs = $breadcrumbs | append (dict "url" $path "name" (humanize (replace $element "-" " "))) }}
+    {{ $path = print $path $element "/" }}  {{/* Build up the path */}}
+    {{ $fullURL := printf "%s%s" $base $path }}  {{/* Create full URL */}}
+    {{ $breadcrumbs = append $breadcrumbs (dict "url" $fullURL "name" (title $element)) }}
   {{ end }}
 {{ end }}
 
 <script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      {{ range $index, $breadcrumb := $breadcrumbs }}
-        {{ if ne $index 0 }},{{ end }}
-        {
-          "@type": "ListItem",
-          "position": {{ add $index 1 }},
-          "item": {
-            "@id": "{{ $breadcrumb.url }}",
-            "name": "{{ $breadcrumb.name }}"
-          }
+{
+  "@context": "http://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {{ range $index, $breadcrumb := $breadcrumbs }}
+      {{ if ne $index 0 }},{{ end }}
+      {
+        "@type": "ListItem",
+        "position": {{ add $index 1 }},
+        "item": {
+          "@id": "{{ $breadcrumb.url }}",
+          "name": "{{ $breadcrumb.name }}"
         }
-      {{ end }}
-    ]
-  }
+      }
+    {{ end }}
+  ]
+}
 </script>
