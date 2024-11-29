@@ -1,49 +1,30 @@
-{{ if .IsHome }}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    {
-      "@type": "ListItem",
-      "position": 1,
-      "name": "Home",
-      "item": "{{ .Permalink }}"
-    }
-  ]
-}
-</script>
-{{ else }}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    {
-      "@type": "ListItem",
-      "position": 1,
-      "name": "Home",
-      "item": "{{ .Site.BaseURL }}"
-    }
-    {{ $position := 2 }}
-    {{ with .CurrentSection }}
-      ,{
-        "@type": "ListItem",
-        "position": {{ $position }},
-        "name": "{{ .Title }}",
-        "item": "{{ .Permalink }}"
-      }
-      {{ $position = add $position 1 }}
-    {{ end }}
-    {{ range $index, $element := .Pages }}
-      ,{
-        "@type": "ListItem",
-        "position": {{ add $position $index }},
-        "name": "{{ $element.Title }}",
-        "item": "{{ $element.Permalink }}"
-      }
-    {{ end }}
-  ]
-}
-</script>
+{{ $url := replace .Permalink ( printf "%s" .Site.BaseURL) "" }}
+{{ $.Scratch.Add "path" .Site.BaseURL }}
+
+{{ $.Scratch.Add "breadcrumb" (slice (dict "url" .Site.BaseURL "name" (i18n "home"))) }}
+{{ range $index, $element := split $url "/" }}
+  {{ $.Scratch.Add "path" $element }}
+  {{ $.Scratch.Add "path" "/" }}
+  {{ if ne $element "" }}
+    {{ $.Scratch.Add "breadcrumb" (slice (dict "url" ($.Scratch.Get "path") "name" (humanize (replace . "-" " ")))) }}
+  {{ end }}
 {{ end }}
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {{ range $index, $breadcrumb := $.Scratch.Get "breadcrumb" }}
+        {{ if ne $index 0 }},{{ end }}
+        {
+          "@type": "ListItem",
+          "position": {{ add $index 1 }},
+          "item": {
+            "@id": "{{ $breadcrumb.url }}",
+            "name": "{{ $breadcrumb.name }}"
+          }
+        }
+      {{ end }} ]
+  }
+</script>
