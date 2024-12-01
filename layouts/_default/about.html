@@ -1,15 +1,21 @@
 {{ define "main" }}
 
+<!--=================== about section start ===================-->
 <section class="section">
   <div class="container">
     <div class="row mb-5">
       <div class="col-12">
         <!-- image path -->
         {{ $imagePath:= .Params.image }}
+
+        <!-- image CDN -->
         {{ if hasPrefix $imagePath "http" }}
         <img loading="lazy" decoding="async" src="{{ $imagePath | safeURL }}" alt="{{ .Title }}"
           class="img-fluid mb-5 w-100 rounded-4">
         {{ else }}
+        <!-- /image cdn -->
+
+        <!-- image processing for multiple device -->
         {{ if fileExists (add `assets/` $imagePath) }}
         {{ $image:= resources.Get $imagePath }}
         {{ $imageFallback:= $image.Resize "1400x" }}
@@ -52,6 +58,7 @@
       </div>
       {{ end }}
       {{ end }}
+
       {{ with .Params.experience }}
       {{ if .enable }}
       <div class="col-md-6">
@@ -69,4 +76,6 @@
     </div>
   </div>
 </section>
+<!--=================== about section end ===================-->
+
 {{ end }}
