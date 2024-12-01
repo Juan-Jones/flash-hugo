@@ -110,6 +110,9 @@
 <!-- regular page -->
 {{ else }}
 {{ partial "page-header.html" . }}
+<p class="breadcrumbs"></p>
+  {{ partial "breadcrumbs.html" . }}
+</p>
 <section class="section-sm">
   <div class="container">
     <div class="row">
